@@ -35,7 +35,7 @@ public class MyTask extends org.apache.tools.ant.Task {
             String fullJarName = jarName + ".jar";
             File f = new File(destDir + "/" + fullJarName);
             if (f.exists())
-                return;
+                continue;
 
             HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
 
@@ -43,7 +43,7 @@ public class MyTask extends org.apache.tools.ant.Task {
                 File jar = new File(localRepo + "/" + fullJarName);
                 if (jar.exists()) {
                     Files.copy(Path.of("C:\\work\\ant-repo\\" + fullJarName), Path.of(destDir + "/" + fullJarName));
-                    return;
+                    continue;
                 }
 
                 client.send(request, HttpResponse.BodyHandlers.ofFile(Path.of(localRepo + "/" + fullJarName)));
