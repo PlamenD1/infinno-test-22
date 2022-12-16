@@ -7,10 +7,12 @@ import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.io.File;
+import java.nio.file.Files;
 public class MyTask extends org.apache.tools.ant.Task {
     HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
     String destDir;
+    String localRepo = "C:\\work\\ant-repo";
     String repoBaseURL;
 
     List<Dependency> dependencies = new ArrayList<>();
@@ -30,10 +32,22 @@ public class MyTask extends org.apache.tools.ant.Task {
         for (Dependency d : dependencies) {
             String jarName = d.artifactId + "-" + d.version;
             String url = buildURL(d, jarName);
+            String fullJarName = jarName + ".jar";
+            File f = new File(destDir + "/" + fullJarName);
+            if (f.exists())
+                return;
+
             HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
 
             try {
-                client.send(request, HttpResponse.BodyHandlers.ofFile(Path.of(destDir + "/" + jarName + ".jar")));
+                File jar = new File(localRepo + "/" + fullJarName);
+                if (jar.exists()) {
+                    Files.copy(Path.of("C:\\work\\ant-repo\\" + fullJarName), Path.of(destDir + "/" + fullJarName));
+                    return;
+                }
+
+                client.send(request, HttpResponse.BodyHandlers.ofFile(Path.of(localRepo + "/" + fullJarName)));
+                Files.copy(Path.of("C:\\work\\ant-repo\\" + fullJarName), Path.of(destDir + "/" + fullJarName));
             } catch (Exception e) {
                 System.out.println("Package with url: " + url + " doesn't exist or could not be downloaded!");
                 throw new RuntimeException(e);
