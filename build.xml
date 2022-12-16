@@ -1,0 +1,31 @@
+<project name="lib-downloader" default="libs" basedir=".">
+    <path id="path">
+        <pathelement path="./Dependency.java"/>
+        <pathelement path="C:\work\apache-ant-1.10.12-bin\apache-ant-1.10.12\lib\ant.jar"/>
+        <pathelement path="./Version.java"/>
+        <pathelement path="./ArtifactId.java"/>
+        <pathelement path="./GroupId.java"/>
+    </path>
+
+    <target name="compile">
+        <mkdir dir="build"/>
+        <javac classpathref="path" srcdir="." destdir="build"/>
+    </target>
+
+    <target name="jar" depends="compile">
+        <jar destfile="mytask.jar" basedir="build"/>
+    </target>
+
+    <target name="libs" depends="jar">
+	    <taskdef name="dependencies" classname="MyTask" classpath="mytask.jar"/>
+        <mkdir dir="jars" />
+        <dependencies destDir="jars" repoBaseURL="https://mvnrepository.com/artifact/">
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>3.5.11</version>
+            </dependency>
+        </dependencies>
+    </target>
+
+</project>
